@@ -1,0 +1,2 @@
+Créez une entité User dans laquelle vous rajoutez une méthode nommée « getUserArticles »,
+qui récupère les 5 derniers articles non-archivés de l'utilisateur.
