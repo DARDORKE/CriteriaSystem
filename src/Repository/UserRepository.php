@@ -4,10 +4,13 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Validator\Constraints\Collection;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -54,6 +57,24 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
 
         $this->add($user, true);
+    }
+
+
+    /**
+     * @throws QueryException
+     */
+    public function getLastLoggedUsers(): Collection
+    {
+        $criteria = Criteria::create()
+                ->andWhere(Criteria::expr()->eq('archived', false))
+                ->orderBy(['lastLogin' => 'DESC'])
+                ->getMaxResults(5)
+        ;
+
+        $qb = $this->createQueryBuilder('a')
+                    ->addCriteria($criteria);
+
+        return $qb->getQuery()->execute();
     }
 
 //    /**
